@@ -49,23 +49,22 @@ count(filter(diam,volume==0))
 
 with(filter(diam,!(volume == 0|volume >=800)), cor.test(price,volume))
 ```
-# Subset the data to exclude diamonds with a volume
-# greater than or equal to 800. Also, exclude diamonds
-# with a volume of 0. Adjust the transparency of the
-# points and add a linear model to the plot.
+**Subset the data to exclude diamonds with a volume greater than or equal to 800. Also, exclude diamonds with a volume of 0. Adjust the transparency of the points and add a linear model to the plot.**
 
 ```{r}
-ggplot(data = filter(diam,!(volume == 0|volume >=800)), aes( x = volume, y = price)) +
+ggplot(data = filter(diam,!(volume == 0|volume >=800)), 
+       aes( x = volume, y = price)) +
   geom_point(alpha= 1/100) +
   geom_smooth(method = 'lm')
 ```
 
-# create a new data frame containing diamonds by clarity
-#       (1) mean_price
-#       (2) median_price
-#       (3) min_price
-#       (4) max_price
-#       (5) n
+**create a new data frame containing diamonds by clarity**
+
+1. mean_price
+2. median_price 
+3. min_price 
+4. max_price 
+5. n
 
 ```{r}
 diamondsByClarity <- diamonds %>%
@@ -86,10 +85,12 @@ diamonds_mp_by_color <- summarise(diamonds_by_color, mean_price = mean(price))
 ```
 
 ```{r}
-p1 <- ggplot(data = diamonds_mp_by_clarity, aes(x = clarity,y = mean_price, fill = clarity)) +
+p1 <- ggplot(data = diamonds_mp_by_clarity, 
+             aes(x = clarity,y = mean_price, fill = clarity)) +
   geom_bar(stat = "identity")
 
-p2 <- ggplot(data = diamonds_mp_by_color, aes(x = color,y = mean_price, fill = color)) +
+p2 <- ggplot(data = diamonds_mp_by_color, 
+             aes(x = color,y = mean_price, fill = color)) +
   geom_bar(stat = "identity")
 
 library(gridExtra)
