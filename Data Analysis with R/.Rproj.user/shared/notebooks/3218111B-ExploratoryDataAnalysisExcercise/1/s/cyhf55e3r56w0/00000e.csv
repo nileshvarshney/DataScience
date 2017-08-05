@@ -1,0 +1,2 @@
+"0","# How many diamonds cost less than $250"
+"0","filter(diam,price < 250) %>% summarise(n())"

@@ -1,0 +1,1 @@
+"0","pf <- read.delim(""https://s3.amazonaws.com/udacity-hosted-downloads/ud651/pseudo_facebook.tsv"",sep  = '\t')"

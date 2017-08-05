@@ -1,0 +1,5 @@
+"0","ggplot(data =  pf, aes(www_likes_received,likes_received)) +"
+"0","  geom_point(color=""black"", alpha = 1/20, position = position_jitter(height = 0)) +"
+"0","  xlim(0,quantile(pf$www_likes_received,0.95)) +"
+"0","  ylim(0,quantile(pf$likes_received,0.95))  +"
+"0","  geom_smooth(method = 'lm',color='red')"

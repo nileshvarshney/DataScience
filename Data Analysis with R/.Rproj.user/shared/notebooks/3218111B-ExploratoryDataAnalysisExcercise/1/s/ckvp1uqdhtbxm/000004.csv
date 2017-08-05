@@ -1,0 +1,1 @@
+"0","qplot(x = price, data = diamonds) + facet_wrap(~cut, scales=""free"")"

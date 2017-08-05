@@ -1,0 +1,3 @@
+"0","t<- ggplot(data = diam) +"
+"0","  geom_freqpoly(aes(carat),binwidth=0.25) +"
+"0","  scale_y_continuous(limits = c(0,16000),breaks = seq(0,16000,1000))"

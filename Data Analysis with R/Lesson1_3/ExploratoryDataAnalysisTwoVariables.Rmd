@@ -1,0 +1,188 @@
+---
+title: "Exploratory Data Analysis Two Variables"
+output: html_notebook
+---
+## read the sample data file
+```{r}
+pf <- read.delim("https://s3.amazonaws.com/udacity-hosted-downloads/ud651/pseudo_facebook.tsv",sep  = '\t')
+```
+
+## scatter plot between age and friend counts
+```{r}
+library(ggplot2)
+ggplot( data = pf) +
+  geom_point(aes(x = age, y = friend_count), alpha = 1/20) +
+  xlim(13,90)  # People Normally age on facebook
+
+summary(pf$age)
+```
+Facebook young users have mroe friend they on average have 1000 friends except few are bin the range of 1000 to 5000. There is spike around age 69 which is quite matching with young age users. Chances are quite high that young users are using age 69 with the possiblity they don't want to share age info. Possibilty of fake age.
+
+## Adding square root function of friend count (y -axis)
+```{r}
+ggplot( data = pf) +
+  geom_point(aes(x = age, y = friend_count), alpha = 1/20, position = position_jitter( height = 0)) + 
+  xlim(13,90) +
+  coord_trans(y = 'sqrt')
+```
+
+## Explore the relationship between friends initiated and age
+```{r}
+ggplot(data = pf) +
+  geom_point(aes(x = age, y = friendships_initiated),alpha = 1/25,position = position_jitter( height = 0)) +
+  xlim(13,90) +
+  coord_trans(y = 'sqrt')
+```
+
+## Conditional mean
+```{r}
+library(dplyr)
+pf.fc_by_age <- pf %>%
+  group_by(age) %>%
+  summarise(fc_mean = mean(friend_count),
+            fc_median = median(friend_count),
+            n = n()) %>%
+  arrange(age)
+
+head(pf.fc_by_age)
+```
+## Plot mean friend count vs. age using a line graph
+```{r}
+ggplot(data = pf.fc_by_age) +
+  geom_line(aes(x = age, y = fc_mean))
+```
+
+#$ Overlaying the summaries with the raw data
+```{r}
+ggplot(data = pf,
+       aes(x = age, y = friend_count)) +
+  #coord_cartesian(xlim = c(13,70),ylim(0,1000)) +
+  xlim(13,70) +
+  ylim(0,1000) +
+  geom_point(
+    alpha = 1/25,
+    position = position_jitter( height = 0),
+    color = "orange"
+    ) +
+  coord_trans(y = 'sqrt') +
+  geom_line(stat = 'summary', fun.y = mean) +
+  geom_line(
+    stat = 'summary', 
+    fun.y = quantile,
+    fun.args = list(probs = .9),
+    color = "blue",
+    linetype = 2
+    ) + 
+   geom_line(
+    stat = 'summary', 
+    fun.y = quantile,
+    fun.args = list(probs = .1),
+    color = "blue",
+    linetype = 2
+    ) + 
+  geom_line(
+    stat = 'summary', 
+    fun.y = quantile,
+    fun.args = list(probs = .5),
+    color = "blue"
+    ) 
+```
+## Correlation : The correlation coefficient of two variables in a data set equals to their covariance divided by the product of their individual standard deviations. It is a normalized measurement of how the two are linearly related.
+
+```{r}
+cor.test(
+  pf$age,
+  pf$friend_count,
+  method = "pearson",
+  alternative = "two.sided",
+  conf.level = 0.95
+  )
+
+# Alternate way
+with(pf,cor.test(age,friend_count, method = "pearson"))  
+```
+Does not look linear relationship. This may be influence by older age. Lets get the same things to restrict the data to 70 yeas age
+
+```{r}
+with(filter(pf,age <= 70),cor.test(age,friend_count,method = "pearson"))
+```
+by scatter plot looks like it is monotonuous relationship between age and friends count. person method does not work well with monotonour relationship hence, lets take spearman which is very much supportive to monotonous relationship. Wiki link for monotonous function - https://en.wikipedia.org/wiki/Monotonic_function
+
+```{r}
+with(filter(pf,age <= 70),cor.test(age,friend_count,method = "spearman"))
+```
+rho- -0.2552934  improved over pearson method
+
+Pearson r correlation: measure the degree of the relationship between linearly related variables.
+
+Spearman rank correlation: Spearman rank correlation is a non-parametric test that is used to measure the degree of association between two variables.Spearman rank correlation test does not assume any assumptions about the distribution of the data.
+
+Kendall rank correlation: Kendall rank correlation is a non-parametric test that measures the strength of dependence between two variables. 
+
+## understand the correlation between www_likes_received and like received
+```{r}
+ggplot(data =  pf, aes(www_likes_received,likes_received)) +
+  geom_point(color="black", alpha = 1/20, position = position_jitter(height = 0)) +
+  xlim(0,quantile(pf$www_likes_received,0.95)) +
+  ylim(0,quantile(pf$likes_received,0.95))  +
+  geom_smooth(method = 'lm',color='red')
+
+```
+
+## Correlation test between these two variables
+```{r}
+with(pf,cor.test(www_likes_received,likes_received))
+```
+```{r}
+library(alr3)
+l.Mitchell <- Mitchell
+
+ggplot(data = l.Mitchell, aes(x = Month, y = Temp)) +
+  geom_point()
+
+with(l.Mitchell, cor.test(Month, Temp))
+```
+Quite week replationship
+
+## Making Sense Of Data by breaking x axis to 12 months
+```{r}
+ggplot(data = l.Mitchell, aes(x = Month, y = Temp)) +
+  geom_point() +
+  scale_x_continuous(breaks = seq(0,203,12)) # since disceate is not working
+
+```
+There are other measures of associations that can detect this. The dcor.ttest() function in the energy package implements a non-parametric test of the independence of two variables.
+
+```{r}
+library(energy)
+with(l.Mitchell, dcor.ttest(Month,Temp))
+```
+```{r}
+pf$age_with_months  <- pf$age + ((12 - pf$dob_month)/12)
+```
+```{r}
+suppressMessages(library(dplyr))
+pf.fc_by_age_months <- pf %>%
+  group_by(age_with_months) %>%
+  summarise(friend_count_mean = mean(friend_count),
+            friend_count_median = median(friend_count),
+            n = n()) %>%
+  arrange(age_with_months)
+```
+
+
+```{r}
+p1 <- ggplot(data = filter(pf.fc_by_age_months,age_with_months < 71),
+       aes(x = age_with_months,y = friend_count_mean)) +
+  geom_line() +
+  geom_smooth()
+
+p2 <- ggplot(data = filter(pf.fc_by_age,age <71),
+             aes(x = age, y = fc_mean)) +
+  geom_line() +
+  geom_smooth()
+
+suppressMessages(library(gridExtra))
+grid.arrange(p1,p2,ncol = 1)
+```
+

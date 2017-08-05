@@ -1,0 +1,4 @@
+"0","library(ggplot2)"
+"0","ggplot(data = aid_received_by_year, aes(x = year, y = India)) + geom_point()  +"
+"0","  scale_x_discrete(breaks = seq(1960,2017,5)) +"
+"0","  geom_smooth(method = 'lm')"

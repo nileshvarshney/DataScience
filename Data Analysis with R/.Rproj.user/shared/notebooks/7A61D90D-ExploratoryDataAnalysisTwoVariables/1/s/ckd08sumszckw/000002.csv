@@ -1,0 +1,4 @@
+"0","ggplot(data = pf) +"
+"0","  geom_point(aes(x = age, y = friendships_initiated),alpha = 1/25,position = position_jitter( height = 0)) +"
+"0","  xlim(13,90) +"
+"0","  coord_trans(y = 'sqrt')"

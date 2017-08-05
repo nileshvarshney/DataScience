@@ -1,0 +1,6 @@
+"0","ggplot(data = diam) +"
+"0","  geom_histogram(aes(price/carat)) +"
+"0","  facet_wrap(~ cut) +"
+"0","  ggtitle(""Price per Carat Histogram for all cuts"") +"
+"0","  xlab(""Price Per Carat"") +"
+"0","  scale_x_log10()"

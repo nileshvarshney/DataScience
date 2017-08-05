@@ -1,0 +1,3 @@
+"0","ggplot(data = subset(pf,!is.na(gender))) +"
+"0","  geom_freqpoly(aes(friend_count,color=gender)) +"
+"0","  scale_x_continuous(limits = c(0,1000),breaks = seq(0,1000,50))"

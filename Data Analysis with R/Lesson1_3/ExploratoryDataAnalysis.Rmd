@@ -1,0 +1,153 @@
+---
+title: "ExploratoryDataAnalysis"
+author: "Nilesh"
+date: "8/2/2017"
+output: html_document
+---
+```{r}
+pf <- read.delim("https://s3.amazonaws.com/udacity-hosted-downloads/ud651/pseudo_facebook.tsv",sep  = '\t')
+names(pf)
+```
+
+## Histogram of user's Birthday
+```{r}
+library(ggplot2)
+ggplot(data = pf) + 
+  geom_histogram(aes(dob_day)) +
+  scale_x_continuous(breaks=1:33) +
+  facet_wrap(~dob_month,nrow = 3)
+```
+### People born on 1st and 15th is almost2.5 times higher than any other day. This is quite strange. Intresting that default date 1 Jan has many fold as DOB. Seems it is default setting of FB or people don't want to share the personal information due to privacy.
+
+## Understand outliers through Friend count
+```{r}
+ggplot(data = subset(pf,!is.na(gender))) + # Removing data for Gender is NA
+  geom_histogram(aes(friend_count),binwidth = 25) +
+  scale_x_continuous(limits = c(0,1000),breaks = seq(0,1000,50)) + # Limit the length of histogram
+  facet_wrap(~gender)  # dividing histogram on gender basis to understand male/female, who have more friends
+
+table(pf$gender)
+by(pf$friend_count,pf$gender,summary)
+```
+## Examine the tenure data
+```{r}
+ggplot(data = pf) +
+  geom_histogram(aes(tenure),color = "black",fill = "blue",binwidth = 30) # Monthly tenure data
+
+ggplot(data = pf) +
+  geom_histogram(aes(tenure/365),color = "black",fill = "orange",binwidth = 0.25) + # Changed to Yearly Tenure
+  scale_x_continuous(breaks = seq(1,7,1),limits = c(0,7)) +
+  xlab("No of Years using Facebook") +
+  ylab("No of Users in Sample")
+```
+## Histogram based on age of the user
+```{r}
+ggplot(data = pf) +
+  geom_histogram(aes(age),binwidth = 1,color = "red",fill="orange") +
+  scale_x_continuous(breaks = seq(0,113,5),limits = c(0,113)) +
+  xlab("Age of the User") +
+  ylab("No of Users in sample")
+```
+
+## Transformation for Normal Distribution
+```{r}
+p1 <- ggplot(data = pf) + 
+  geom_histogram(aes(friend_count))  # Actual data
+p2 <- ggplot(data = pf) + 
+  geom_histogram(aes(log10(friend_count ))) +  # transformed to log (added one to avoid infite)
+  scale_x_log10()
+
+p3<- ggplot(data = pf) + 
+  geom_histogram(aes(sqrt(friend_count))) + # Square root transformation
+  scale_x_sqrt()
+
+library(gridExtra)
+grid.arrange(p1,p2,p3,nrow = 1)
+
+# other may, it may work
+ggplot(data = pf) +
+  geom_histogram(aes(friend_count)) +
+  scale_x_log10()
+
+ggplot(data = pf) +
+  geom_histogram(aes(friend_count)) +
+  scale_x_sqrt()
+```
+
+## Frequency Polygon( before we had histogram)
+```{r warning=FALSE}
+ggplot(data = subset(pf,!is.na(gender))) +
+  geom_freqpoly(aes(friend_count,color=gender)) +
+  scale_x_continuous(limits = c(0,1000),breaks = seq(0,1000,50))
+```
+# This plot doesn't say much about  who have more friend. Lets make it propotional polygon.
+```{r}
+
+
+
+```
+
+```{r}
+ggplot( data = subset(pf,!is.na(gender))) +
+  geom_freqpoly(aes(x = friend_count, y = ..count../sum(..count..),color = gender))  +
+  scale_x_continuous(breaks = seq(0,1000,50),limits = c(0,1000)) +
+  xlab("Friend Counts") +
+  ylab("Propotion of users with that friend count")
+
+
+ggplot( data = subset(pf,!is.na(gender))) +
+  geom_freqpoly(aes(x = friend_count, y = ..density..,color = gender))  +
+  scale_x_continuous(breaks = seq(0,1000,50),limits = c(0,1000)) +
+  xlab("Friend Counts") +
+  ylab("Density Plot friend count")
+
+```
+## Determine which gender makes more likes on www_likes
+
+```{r}
+library(dplyr)
+ggplot( data = filter(pf,!is.na(gender)) ) +
+  geom_freqpoly(aes(x = www_likes , color = gender)) +
+  scale_x_continuous(breaks = seq(0,50,10),limits = c(0,50))
+
+```
+## How many www_likes for make and femake
+
+```{r}
+pf %>% group_by(gender) %>% summarise(sum(www_likes))
+```
+
+
+## Boxplot
+```{r}
+ggplot( data = filter(pf,!is.na(gender))) +
+  geom_boxplot(aes(x = gender, y = friend_count)) +
+  xlab("Gender") +
+  ylab("Friend Count") +
+  coord_cartesian(ylim = c(0,300))
+
+## Other way
+ggplot( data = filter(pf,!is.na(gender))) +
+  geom_boxplot(aes(x = gender, y = friend_count)) +
+  xlab("Gender") +
+  ylab("Friend Count") +
+  scale_y_continuous(limits = c(0,300))  # difference but it removing data point, upper quartile value is different
+
+group_by(pf,gender) %>% summarise(mean(friend_count))
+```
+## "Who made more friend requests on average - men or women?"
+```{r}
+ggplot(data = filter(pf,!is.na(gender))) +
+  geom_boxplot(aes(x = gender , y = friendships_initiated )) +
+  coord_cartesian(ylim = c(0,250))
+summary(subset(pf,gender == "male")$friendships_initiated)
+summary(subset(pf,gender == "female")$friendships_initiated)
+by(pf$friendships_initiated,pf$gender,summary)
+```
+## Getting Logical
+What percentange of Check in using Mobile?
+```{r}
+pf$mobile_check_in  <- NA
+pf$mobile_check_in <- ifelse(pf$mobile_likes > 0, 1,0)
+sum(pf$mobile_check_in)/length(pf$mobile_check_in)
+```

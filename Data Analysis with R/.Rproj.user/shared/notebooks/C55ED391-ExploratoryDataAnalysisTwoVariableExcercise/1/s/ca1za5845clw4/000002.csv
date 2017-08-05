@@ -1,0 +1,2 @@
+"0","#  Change 1st column name to country"
+"0","colnames(aid_received)[1] <- ""Country"""

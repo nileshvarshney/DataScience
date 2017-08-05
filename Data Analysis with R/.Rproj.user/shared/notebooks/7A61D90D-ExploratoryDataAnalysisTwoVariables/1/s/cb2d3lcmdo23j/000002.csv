@@ -1,0 +1,22 @@
+"0","library(dplyr)"
+"2","
+Attaching package: ‘dplyr’
+
+"
+"2","The following objects are masked from ‘package:stats’:
+
+    filter, lag
+
+"
+"2","The following objects are masked from ‘package:base’:
+
+    intersect, setdiff, setequal, union
+
+"
+"0","pf.fc_by_age <- pf %>%"
+"0","  group_by(age) %>%"
+"0","  summarise(fc_mean = mean(friend_count),"
+"0","            fc_median = median(friend_count),"
+"0","            n = n()) %>%"
+"0","  arrange(age)"
+"0","head(pf.fc_by_age)"

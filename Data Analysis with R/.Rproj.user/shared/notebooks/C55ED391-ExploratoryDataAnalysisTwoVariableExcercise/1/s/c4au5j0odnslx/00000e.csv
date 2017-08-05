@@ -1,0 +1,2 @@
+"0","# Remove all columns having all rows with NA"
+"0","aid_received_by_year <- aid_received_by_year[,colSums(is.na(aid_received_by_year))<nrow(aid_received_by_year)]"

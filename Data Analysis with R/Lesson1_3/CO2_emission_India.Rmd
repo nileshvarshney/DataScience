@@ -1,0 +1,25 @@
+---
+title: "CO2 emision In Inda"
+output: html_notebook
+### Import data set
+---
+```{r}
+library(readxl)
+co2_emision_India <- read_excel("~/Google Drive/Data Science Approach/R Learning/Data Analysis with R/co2_emision_India.xlsx")
+```
+
+## Understand solid fuel emision in India
+```{r,warning=FALSE}
+library(ggplot2)
+ggplot(data = co2_emision_India,aes(x = Year)) + geom_line(aes(y=solid.fuel),color = "red") +
+  scale_x_continuous(breaks = seq(1960,2016,5)) + 
+  scale_y_continuous(breaks = seq(0,100,5)) + 
+  geom_line(aes(y=liquid.fuel),color = "blue") +
+  geom_line(aes(y=gaseous.fuel),color = "green") +
+  geom_line(aes(Year,(100 - gaseous.fuel - solid.fuel -liquid.fuel)),color = "orange") +
+  ylab("Co2 Emision") +
+  ggtitle("Co2 Emission in India By different Fuels") 
+
+```
+
+

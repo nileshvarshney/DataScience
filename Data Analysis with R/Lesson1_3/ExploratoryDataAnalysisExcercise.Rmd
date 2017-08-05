@@ -1,0 +1,146 @@
+---# No of observation 
+nrow(diam)
+title: "ExploratoryDataAnalysisExcercise"
+author: "Nilesh"
+date: "8/3/2017"
+output: html_document
+---
+## Load Diamond Data 
+```{r}
+diam <- diamonds
+```
+```{r}
+# No of observation 
+nrow(diam)
+
+# No of Varaables in dataset
+ncol(diam)
+str(diam)
+```
+
+## Create a histogram of the price of all diamonds in dataset
+```{r}
+ggplot(data = diam) +
+  geom_histogram(aes(price),binwidth = 50) +
+  scale_x_continuous(limits = c(250,2000),breaks = seq(250,2000,200))
+ggsave('priceHistogram.png')
+summary(diam$price)
+```
+
+```{r}
+# How many diamonds are less than $ 500
+library(dplyr)
+filter(diam,price < 500) %>% summarise(n())
+
+# How many diamonds cost less than $250
+filter(diam,price < 250) %>% summarise(n())
+
+# How many diamonds cost more than $15000
+filter(diam,price >= 15000) %>% summarise(n())
+```
+# Break out the histogram of diamond prices by cut.
+```{r}
+ggplot(data = diam) +
+  geom_histogram(aes(x = price)) +
+  #scale_x_continuous(breaks = seq(250,5000,100),limits = c(250,5000)) +
+  facet_wrap(~ cut,ncol = 2)
+
+by(diam$price,diam$cut,max)  # summary function do some rounding hence it may not provide correct answer
+by(diam$price,diam$cut,min)
+
+by(diam$price,diam$cut,median)
+```
+```{r}
+qplot(x = price, data = diamonds) + facet_wrap(~cut)
+qplot(x = price, data = diamonds) + facet_wrap(~cut, scales="free")
+ggplot(diamonds, aes(x = price)) + geom_histogram() + facet_wrap(~cut, scales = "free")
+```
+
+```{r}
+ggplot(data = diam) +
+  geom_histogram(aes(price/carat)) +
+  facet_wrap(~ cut) +
+  ggtitle("Price per Carat Histogram for all cuts") +
+  xlab("Price Per Carat") +
+  scale_x_log10()
+```
+
+## Investigate the price of diamonds using box plots by cut
+```{r}
+ggplot(data = diam) +
+  geom_boxplot(aes(x = cut, y = price)) +
+  coord_cartesian(ylim = c(0,8000)) +
+  scale_y_continuous(seq(0,8000,500)) +
+  ggtitle("Price per Carat Boxplot for all cuts")
+ 
+ggsave("boxplot_diamond_price_cut.png")
+ggplot(data = diam) +
+  geom_boxplot(aes(x = color, y = price)) +
+  coord_cartesian(ylim = c(0,8000)) +
+  scale_y_continuous(seq(0,8000,500))+
+  ggtitle("Price per Carat Boxplot for all color")
+
+ggsave("boxplot_diamond_price_color.png")
+
+ggplot(data = diam) +
+  geom_boxplot(aes(x = clarity, y = price)) +
+  coord_cartesian(ylim = c(0,8000)) +
+  scale_y_continuous(seq(0,8000,500)) +
+  ggtitle("Price per Carat Boxplot for all clarity")
+
+ggsave("boxplot_diamond_price_clarity.png") 
+```
+```{r}
+# What is the price range for the middle 50%  of diamond with color D
+by(diam$price,diam$color,summary)
+
+# IQR of worst(J) and best(D) color
+IQR(subset(diam,diam$color == "D")$price)
+IQR(subset(diam,diam$color == "J")$price)
+```
+# Investigate the price per carat of diamonds across
+# the different colors of diamonds using boxplots.
+```{r}
+ggplot(data = diam) +
+  geom_boxplot(aes(x = color,y = price/carat)) +
+  scale_y_continuous(limits = c(0,8000),breaks = seq(0,8000,1000)) +
+  ggtitle("Price Per Carat Comparision color wise") +
+  ylab("Price Oer Carat")
+```
+## Freplot carat
+```{r}
+t<- ggplot(data = diam) +
+  geom_freqpoly(aes(carat),binwidth=0.25) +
+  scale_y_continuous(limits = c(0,16000),breaks = seq(0,16000,1000))
+```
+
+```{r}
+library(readxl)
+aid.received<- dataset <- read_excel("aid_received.xlsx")
+# tranport row to column and convert to data frame
+aid.tran<- as.data.frame(t(aid.received))
+```
+
+
+```{r}
+colname <- as.matrix(aid.tran[1,])   # Get column name from 1st row 
+ # Replace default column name to correct   
+colnames(aid.tran) <- colname       
+aid.tran <- aid.tran[-1,]
+```
+
+```{r}
+rm(t)
+rm(aid.received)
+rm(colname)
+```
+
+```{r}
+aid.tran$year <- rownames(aid.tran)
+```
+```{r}
+# Aid Histogram for India
+ggplot(data = aid.tran) +
+  geom_histogram(aes(India))
+```
+

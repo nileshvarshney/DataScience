@@ -1,0 +1,3 @@
+"0","ggplot(data = filter(pf,!is.na(gender))) +"
+"0","  geom_boxplot(aes(x = gender , y = friendships_initiated )) +"
+"0","  coord_cartesian(ylim = c(0,250))"

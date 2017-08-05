@@ -1,0 +1,5 @@
+"0","ggplot( data = subset(pf,!is.na(gender))) +"
+"0","  geom_freqpoly(aes(x = friend_count, y = ..density..,color = gender))  +"
+"0","  scale_x_continuous(breaks = seq(0,1000,50),limits = c(0,1000)) +"
+"0","  xlab(""Friend Counts"") +"
+"0","  ylab(""Density Plot friend count"")"

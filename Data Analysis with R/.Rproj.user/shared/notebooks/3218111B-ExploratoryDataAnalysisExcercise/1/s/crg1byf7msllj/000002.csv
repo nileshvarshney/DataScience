@@ -1,0 +1,5 @@
+"0","rm(t)"
+"2","object 't' not found"
+"0","rm(aid.received)"
+"2","object 'aid.received' not found"
+"0","rm(colname)"

@@ -1,0 +1,5 @@
+"0","# Aid Histogram for India"
+"0","ggplot(data = aid.tran) +"
+"0","  geom_histogram(aes(India))"
+"2","Error: StatBin requires a continuous x variable the x variable is discrete. Perhaps you want stat=""count""?
+"

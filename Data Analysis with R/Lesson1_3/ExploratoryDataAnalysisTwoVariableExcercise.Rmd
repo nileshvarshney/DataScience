@@ -1,0 +1,55 @@
+---
+title: "Exploratory Data Analysis Two Variable"
+output: html_notebook
+---
+## Import dataset
+```{r}
+library(readxl)
+aid_received <- read_excel("~/Google Drive/Data Science Approach/R Learning/Data Analysis with R/aid_received.xlsx")
+```
+
+## Data Wrangling
+```{r}
+#  Change 1st column name to country
+colnames(aid_received)[1] <- "Country"
+```
+
+```{r}
+# Change row data to columns
+aid_received_by_year <- t(aid_received)
+aid_received_by_year <- as.data.frame(aid_received_by_year)
+first_row <- aid_received_by_year[1,]
+aid_received_by_year <- aid_received_by_year[-1,]
+first_row <- as.matrix(first_row)
+colnames(aid_received_by_year) <- first_row
+```
+
+```{r}
+# Remove all columns having all rows with NA
+aid_received_by_year <- aid_received_by_year[,colSums(is.na(aid_received_by_year))<nrow(aid_received_by_year)]
+```
+
+```{r}
+# remove unwanted variables
+rm(aid_received)
+rm(first_row)
+```
+
+```{r}
+# aid the year columns to dataset
+aid_received_by_year$year <- rownames(aid_received_by_year)
+```
+
+```{r}
+aid_received_by_year$India <- as.numeric(as.character(aid_received_by_year$India))
+```
+
+
+```{r}
+
+library(ggplot2)
+ggplot(data = aid_received_by_year, aes(x = year, y = India)) + geom_point()  +
+  scale_x_discrete(breaks = seq(1960,2017,5))
+  
+```
+

@@ -1,0 +1,4 @@
+"0","library(dplyr)"
+"0","ggplot( data = filter(pf,!is.na(gender)) ) +"
+"0","  geom_freqpoly(aes(x = www_likes , color = gender)) +"
+"0","  scale_x_continuous(breaks = seq(0,50,10),limits = c(0,50))"

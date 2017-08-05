@@ -1,0 +1,2 @@
+"0","# How many diamonds cost more than $15000"
+"0","filter(diam,price >= 15000) %>% summarise(n())"

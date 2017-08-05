@@ -1,0 +1,2 @@
+"0","library(readxl)"
+"0","aid_received <- read_excel(""~/Google Drive/Data Science Approach/R Learning/Data Analysis with R/aid_received.xlsx"")"

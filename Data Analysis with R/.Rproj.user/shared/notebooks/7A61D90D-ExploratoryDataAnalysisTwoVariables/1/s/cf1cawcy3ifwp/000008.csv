@@ -1,0 +1,4 @@
+"0","library(alr3)"
+"0","l.Mitchell <- Mitchell"
+"0","ggplot(data = l.Mitchell, aes(x = Month, y = Temp)) +"
+"0","  geom_point()"

@@ -1,0 +1,4 @@
+"0","library(ggplot2)"
+"0","ggplot( data = pf) +"
+"0","  geom_point(aes(x = age, y = friend_count), alpha = 1/20) +"
+"0","  xlim(13,90)  # People Normally age on facebook"

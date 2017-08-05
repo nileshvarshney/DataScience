@@ -1,0 +1,3 @@
+"0","# How many diamonds are less than $ 500"
+"0","library(dplyr)"
+"0","filter(diam,price < 500) %>% summarise(n())"

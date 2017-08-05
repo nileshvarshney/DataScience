@@ -1,0 +1,3 @@
+"0","ggplot(data = l.Mitchell, aes(x = Month, y = Temp)) +"
+"0","  geom_point() +"
+"0","  scale_x_continuous(breaks = seq(0,203,12))"

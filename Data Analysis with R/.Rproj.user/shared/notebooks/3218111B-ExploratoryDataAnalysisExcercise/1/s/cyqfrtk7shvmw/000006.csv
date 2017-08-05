@@ -1,0 +1,4 @@
+"0","library(readxl)"
+"0","aid.received<- dataset <- read_excel(""aid_received.xlsx"")"
+"0","# tranport row to column and convert to data frame"
+"0","aid.tran<- as.data.frame(t(aid.received))"

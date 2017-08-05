@@ -1,0 +1,6 @@
+"0","## Other way"
+"0","ggplot( data = filter(pf,!is.na(gender))) +"
+"0","  geom_boxplot(aes(x = gender, y = friend_count)) +"
+"0","  xlab(""Gender"") +"
+"0","  ylab(""Friend Count"") +"
+"0","  scale_y_continuous(limits = c(0,300))  # difference but it removing data point, upper quartile value is different"

@@ -1,0 +1,3 @@
+"0","ggplot(data = diam) +"
+"0","  geom_histogram(aes(price),binwidth = 50) +"
+"0","  scale_x_continuous(limits = c(250,2000),breaks = seq(250,2000,200))"

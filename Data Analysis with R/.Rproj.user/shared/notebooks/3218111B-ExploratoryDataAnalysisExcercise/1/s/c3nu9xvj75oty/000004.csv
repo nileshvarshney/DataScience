@@ -1,0 +1,7 @@
+"0","diam <- diamonds"
+"0","# No of observation "
+"0","nrow(diam)"
+"1","[1]"
+"1"," 53940"
+"1","
+"

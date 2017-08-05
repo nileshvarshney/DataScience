@@ -1,0 +1,5 @@
+"0","ggplot(data = diam) +"
+"0","  geom_boxplot(aes(x = color,y = price/carat)) +"
+"0","  scale_y_continuous(limits = c(0,8000),breaks = seq(0,8000,1000)) +"
+"0","  ggtitle(""Price Per Carat Comparision color wise"") +"
+"0","  ylab(""Price Oer Carat"")"

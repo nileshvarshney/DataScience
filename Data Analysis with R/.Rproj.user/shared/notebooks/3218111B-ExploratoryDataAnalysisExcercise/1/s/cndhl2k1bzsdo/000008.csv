@@ -1,0 +1,4 @@
+"0","colname <- as.matrix(aid.tran[1,])   # Get column name from 1st row "
+"0"," # Replace default column name to correct   "
+"0","colnames(aid.tran) <- colname       "
+"0","aid.tran <- aid.tran[-1,]              "
