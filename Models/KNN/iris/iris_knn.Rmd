@@ -1,0 +1,128 @@
+---
+title: "Iris - Classification Using Nearest Neighbors"
+output: html_notebook
+---
+#####**Requirement** : Create a clasification Model that can identify Species on the basis of Sepal and Petal size.
+
+#####**Solution** : There are 150 observations, Model will use 80% records to train the model and remaining 20% data will be used to test its performance.
+
+#### Import Observation Data 
+```{r,warning=FALSE}
+iris <- read.csv("iris.csv")
+head(iris)
+```
+
+#### Exploratory Data Analysis
+```{r}
+str(iris)
+summary(iris)
+```
+
+*Data is very much balance. There are 50 observations for each species. It does not contain any missing value. Summary is also not telling about extreame outliers*
+
+Lets understand the data distribution and relation between width and length
+```{r}
+suppressWarnings(suppressMessages(library(ggplot2)))
+ggplot( data = iris, aes(x = SepalLengthCm,y = SepalWidthCm))  +  
+  geom_point(aes(color= Species)) +
+  ggtitle("Sepal Length Vs Width")
+
+ggplot( data = iris, aes(x = PetalLengthCm, y = PetalWidthCm))  +  
+  geom_point(aes(color= Species)) +
+  ggtitle("Petal Length Vs Width")
+```
+*Sepal plot shows that Setosa is linear separable but rest Soecies are not linear separable. Petal data clealy dividing data and they can be linearly separable. Only few observation of Virginica are mixing with Versicolor.*
+
+##### Function to tranform data to standard range by using z-score standardization
+```{r}
+PreProcessing <- function(data,parameter=NULL){
+  label_names <- colnames(data)
+  len <- length(label_names)
+  data_standardized <- cbind(data.frame(scale(data[,-len])),Species = data[,len])
+  return(data_standardized)
+}
+
+```
+
+##### Function to divide data into training and validation sets
+```{r}
+SplitData <- function(data,train_percent,train="Y"){
+  library(caTools)
+  set.seed(2017)
+  len <- length(colnames(data()))
+  ratio = train_percent/100
+  split = sample.split(data$Species, SplitRatio = ratio)
+  train.set <- subset(data, split == TRUE)
+  valid.set <- subset(data, split == FALSE)
+  if (train == 'Y'){
+    return(train.set)
+  } else {
+    return(valid.set)
+  }
+}
+```
+
+##### Function to Build Model and Predict
+*This function accepts training and validation set of data and returns crosstable comparision between actual and predicted value*
+```{r,echo=TRUE}
+library(class)
+library(gmodels)
+build_and_predict <- function(train.data,test.data,k){
+  set.seed(2017)
+  len <- length(colnames(train.data))
+  class_Label <- train.data[,len]
+  pred <- knn(train.data[-len],test.data[-len],cl = class_Label , k = k)
+  valid_label <- test.data[,len]
+  m <- CrossTable(test.data[,len],pred,prop.chisq = FALSE)
+  return(m)
+}
+```
+
+##### Function to calculate the percentage of correctly classified observation
+```{r}
+eff <- function(xtable,test.data){
+  dummy <- data.frame(xtable$t)
+  obs <- nrow(test.data)
+  matched_count <- sum(ifelse(dummy$x ==dummy$y,dummy$Freq,0))
+  efficiency <- round(matched_count * 100/obs,2)
+}
+```
+
+### Complete Processing
+```{r}
+# standarized the data
+iris.scale <- PreProcessing(iris[,-1])
+
+# Split data in training and validation set
+iris.scale.train <- SplitData(iris.scale,80,"Y")
+iris.scale.test <- SplitData(iris.scale,80,"N")
+```
+
+```{r,include=FALSE}
+# Checking multiple K Values
+model.eff <- data.frame(K = numeric(),eff = numeric())
+pre_eff = 0
+for (k in (1:round(sqrt(nrow(iris.scale.train)))))
+{
+ 
+  invisible(m <- build_and_predict(iris.scale.train,iris.scale.test,k))
+  if ( round(eff(m,iris.scale.test),2) > round(pre_eff,2) ){
+    model.eff <- rbind(model.eff, data.frame(K = k, eff = eff(m,iris.scale.test)))
+    pre_eff <- eff(m,iris.scale.test)
+}
+  #print(paste0("Efficieny for K = ",k, " is ",eff(m,iris.scale.test)))
+}
+```
+**Model Efficiency for different K value**
+```{r}
+model.eff
+```
+#### Get crossTable for all K value
+```{r,include=TRUE}
+for ( k in model.eff$K){
+  m <- build_and_predict(iris.scale.train,iris.scale.test,k)
+  print(paste0("Efficieny for K = ",k, " is ",eff(m,iris.scale.test)))
+}
+```
+**Suggested K value is 6. There is not difference to use K value anything between 6 to 11. There are all giving result.**
+

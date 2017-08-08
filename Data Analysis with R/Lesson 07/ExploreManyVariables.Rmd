@@ -2,3 +2,215 @@
 title: "Explore Many Variable"
 output: html_notebook
 ---
+# Maltivariate
+### Import Data
+```{r}
+pf <- read.delim("https://s3.amazonaws.com/udacity-hosted-downloads/ud651/pseudo_facebook.tsv",sep  = '\t')
+```
+
+### Third Qualitative Variable
+```{r}
+suppressMessages(library(ggplot2))
+suppressMessages(library(dplyr))
+ggplot(data = filter(pf,!is.na(gender)), aes(x = gender, y = age))  +
+  geom_boxplot() +
+  stat_summary(fun.y = mean,geom = "point",type = 4)
+```
+**create a new data frame, called 'pf.fc_by_age_gender', that contains**
+
+1.  mean_friend_count
+2.  median_friend_count
+3.  n
+
+```{r}
+pf.fc_by_age_gender <- pf %>%
+  group_by(age,gender) %>%
+  summarise(mean_friend_count = mean(friend_count),
+            median_friend_count = median(friend_count),
+            n = n()) %>%
+  ungroup() %>%
+  arrange(age)
+
+head(pf.fc_by_age_gender)
+```
+
+**Create a line graph showing the median friend count over the ages for each gender.**
+
+```{r}
+ggplot(data = filter(pf.fc_by_age_gender,!is.na(gender)), aes(x = age, y = median_friend_count)) +
+  geom_line(aes(color = gender))
+```
+
+### Reshape data
+**Understand how many time male have friend compare to female**
+
+```{r}
+library(reshape2)
+pf.fc_by_age_gender.wide <- dcast(filter(pf.fc_by_age_gender,!is.na(gender)),
+                                  age ~ gender,
+                                  value.var = 'median_friend_count')
+```
+
+**Plot the ratio of the female to male median**
+```{r}
+ggplot(data = pf.fc_by_age_gender.wide,
+       aes(x = age, y = female/male)) +
+  geom_line() +
+  geom_hline(yintercept = 1, linetype =2, alpha = 1/3)
+```
+*It indicates young female has around 2.5 times more friends compare to male. This ratio is decreassing at age 20 but again picking up after age 32.*
+
+### Third Quantitative Variable
+**Understand the People with longer tenuare should have more Friend count **
+
+```{r}
+# Year joined Facebook
+pf$year_joined <- floor(2014 - pf$tenure/365)
+
+summary(pf$year_joined)
+table(pf$year_joined)
+```
+
+*Year joined column clearly indicates that most the people jined year 2012 and 2013. There were 9 peoples in 2005 and it gradually increasing. Year 2014 does not have much users joined. Possibly data may not contain year 2014 data completely. To understand how friend count increased with tenure, we will divide this data in 4 buckets. Year 2005 to 2009 have very less people joined but they may have high friend count. Lets understand*
+ 
+```{r}
+pf$year_joined.bucket <- cut(pf$year_joined,c(2004,2009,2011,2012,2014))
+table(pf$year_joined.bucket)
+```
+
+*People joined summary between different backet*
+
+**Create a line graph of friend_count vs. age so that each year_joined.bucket for median value**
+
+```{r}
+ggplot(
+  data = subset(pf, !is.na(year_joined.bucket)), 
+  aes(x = age,y = friend_count)) +
+  geom_line(
+    aes(color = year_joined.bucket), 
+    stat = 'summary',
+    fun.y = median
+    ) 
+```
+
+*It shows that people joined between 2004 to 2009 have highest friend counts. Lets examine the same plot for mean value and grand mean line*
+```{r}
+ggplot(
+  data = subset(pf, !is.na(year_joined.bucket)), 
+  aes(x = age,y = friend_count)) +
+  geom_line(aes(color = year_joined.bucket),
+    stat = 'summary',
+    fun.y = mean
+    ) +
+ geom_line(stat = 'summary',fun.y = mean,linetype = 2)
+```
+*Grand mean line indicate that 2012-2014 and 2011-2012 datata fall around grand mean line.*
+
+### Understand the Friending Rate
+**To understand the friending rate, lets see median_rate and max_rate of friendship**
+```{r}
+with(subset(pf, tenure >= 1),  summary(friend_count/tenure))
+```
+*Seems that everything is not correct as 3rd quartile is just 0.56 but max is quite high 417*
+
+### Understand how the tensure is related to friendship_initiated
+```{r}
+ggplot(
+  data = subset(pf,tenure >= 1),
+  aes( x= 7*round(tenure/7), y = friendships_initiated/tenure)) +
+  geom_line(
+    aes(color = year_joined.bucket),
+    stat = 'summary',
+    fun.y =mean
+    )
+```
+plot shows friendship initiation is decrease with the tenure. 
+
+Make this graph more smooother by using geom_smooth
+
+```{r}
+ggplot(
+  data = subset(pf,tenure >= 1),
+  aes( x= tenure, y = friendships_initiated/tenure)) +
+  geom_smooth(
+    aes(color = year_joined.bucket))
+```
+### Yogurt dataset analysis
+
+### Import dataset
+```{r}
+yo <- read.csv("yogurt.csv")
+str(yo)
+```
+**Change ID to factor**
+
+```{r}
+yo$id <- factor(yo$id)
+```
+```{r}
+str(yo)
+ggplot(data = yo, aes(x=price)) + geom_histogram(binwidth = 5)
+```
+```{r}
+summary(yo$price)
+unique(yo$price)
+table(yo$price)
+```
+
+**Create a new variable called all.purchases, which gives the total counts of yogurt for each observation or household.**
+
+```{r}
+yo$all.purchases <-
+                                yo$strawberry + 
+                                yo$blueberry + 
+                                yo$pina.colada + 
+                                yo$plain + 
+                                yo$mixed.berry
+                              
+head(yo,20)
+```
+
+**All Purchase Histogram**
+```{r}
+ggplot( data = yo, aes(x = all.purchases)) +
+  geom_histogram(binwidth = 1)
+```
+
+**Prices Over Time**
+```{r}
+ggplot(data = yo, aes(x = time, y = price)) +
+  geom_point(alpha = 1/10,color = "orange")
+```
+
+**Looking At Samples Of Households**
+```{r}
+set.seed(4230)
+sample.ids <- sample(levels(yo$id),16)
+
+```
+
+
+```{r}
+ggplot(data = subset(yo, id %in% sample.ids),aes(x = time,y = price)) +
+  facet_wrap( ~ id) + 
+  geom_line() +
+  geom_point(aes(size = all.purchases),pch =1)
+```
+
+## Scatter Plot Matrix
+```{r}
+suppressWarnings(library(GGally))
+theme_set(theme_minimal(20))
+```
+```{r,warning= FALSE}
+set.seed(1836)
+pf_subset <- pf[,c(2:15)]
+names(pf_subset)
+ggpairs(pf_subset[sample.int(nrow(pf_subset),1000),])
+```
+
+
+
+
+
+

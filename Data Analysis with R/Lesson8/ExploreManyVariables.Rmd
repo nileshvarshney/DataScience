@@ -1,0 +1,28 @@
+---
+title: "Explore Many Variables"
+output: html_notebook
+---
+```{r}
+library(ggplot2)
+diamonds <-diamonds
+```
+
+**Create a histogram of diamond prices. Facet the histogram by diamond color and use cut to color the histogram bars.**
+
+```{r}
+ggplot(data = diamonds,aes(price)) +
+  geom_histogram(aes(fill = cut)) + 
+  facet_wrap( ~ color)
+```
+
+**Create a scatterplot of diamond price vs. table and color the points by the cut of the diamond.**
+
+```{r}
+ggplot(data = diamonds,aes(price,table)) +
+  geom_point(aes(color = cut))
+```
+```{r}
+names(iris)
+ggplot(data = iris, aes( x =Sepal.Length, y = Sepal.Width )) + geom_point(aes(color = Species))
+```
+
