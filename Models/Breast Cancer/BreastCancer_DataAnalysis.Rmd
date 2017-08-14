@@ -1,0 +1,81 @@
+---
+title: "Breast Cancer Data Analysis"
+output:
+  html_notebook: default
+  html_document: default
+---
+
+
+#### Initial Setup and required Library imports
+```{r}
+rm(list = ls())
+gc()
+```
+
+```{r,echo=FALSE,include=FALSE}
+setwd("~/Google Drive/Gits/DataScience/Models/Breast Cancer")
+library(knitr)
+library(dplyr)
+library(ggplot2)
+library(gridExtra)
+library(caTools)
+```
+
+
+#### Import data
+```{r,results ='asis'}
+cancer.data <- read.csv("data.csv")
+cancer.data <- cancer.data %>%
+  select(-c(X,id))
+kable(head(cancer.data,3))
+```
+
+**Summary**
+```{r}
+summary(cancer.data$diagnosis)
+```
+**Box Plot for few variables
+
+```{r}
+p1 <- ggplot(data = cancer.data) +
+  geom_boxplot(aes(diagnosis,radius_mean))
+
+p2 <- ggplot(data = cancer.data) +
+  geom_boxplot(aes(diagnosis,texture_mean))
+
+p3 <- ggplot(data = cancer.data) +
+  geom_boxplot(aes(diagnosis,perimeter_mean))
+
+p4 <- ggplot(data = cancer.data) +
+  geom_boxplot(aes(diagnosis,area_mean))
+
+p5 <- ggplot(data = cancer.data) +
+  geom_boxplot(aes(diagnosis,smoothness_mean))
+
+p6 <- ggplot(data = cancer.data) +
+  geom_boxplot(aes(diagnosis,compactness_mean))
+
+grid.arrange(p1,p2,p3,p4,p5,p6, nrow = 2)
+```
+
+**Divide data between test and train set**
+```{r}
+set.seed(2017) 
+sample = sample.split(cancer.data$diagnosis, SplitRatio = .80)
+train.set = subset(cancer.data, sample == TRUE)
+test.set  = subset(cancer.data, sample == FALSE)
+```
+```{r}
+normalize <- function(x)
+{
+  return((x - min(x))/(max(x) - min(x)))
+}
+```
+```{r}
+train.set.normalize <- as.data.frame(lapply(train.set[2:31],normalize))
+test.set.normalize <- as.data.frame(lapply(test.set[2:31],normalize))
+
+train.set.normalize$diagnosis <- train.set$diagnosis
+test.set.normalize$diagnosis <- test.set$diagnosis
+```
+

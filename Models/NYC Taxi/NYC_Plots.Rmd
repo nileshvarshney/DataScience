@@ -1,0 +1,32 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Plots
+```{r}
+# mean travel time 
+library(ggplot2)
+```
+```{r}
+ggplot(data = train.set.nooutlier) + 
+  geom_boxplot(aes(x = pickup_day, y = trip_duration, fill = pickup_day)) +
+  scale_y_continuous(breaks = seq(0,1000,100),limits=c(0, 1500))
+```
+*Passangers are  spending less time in taxi on Sunday and monday. Compare to other day except Saturday.*
+
+*Trip counts on day basis*
+```{r}
+ggplot(data = train.set.nooutlier) +
+  geom_freqpoly(aes(trip_duration,color = pickup_day)) +
+  scale_x_continuous(breaks = seq(0,2000,250),limits = c(0,2000),name = "Trip Duration") +
+  scale_y_continuous(name = "Trip Counts", breaks = seq(0,18000,1000))
+```
+*People using taxi most on weekend and friday compare to other day for short trip*
+```{r}
+ggplot(data = train.set.nooutlier) +
+  geom_point(aes(pickup_period,trip_duration))
+  
+```
+
+

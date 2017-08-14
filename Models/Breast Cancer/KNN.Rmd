@@ -1,0 +1,51 @@
+---
+title: "KNN On breast Cancer Data"
+output: html_notebook
+---
+```{r}
+library(class)  # Package for KNN
+library(gmodels)
+```
+
+```{r}
+# nrow(train.set[2])
+# nrow(train.set[-c(1,2)])
+```
+
+
+```{r,echo=FALSE}
+k_test <- function ( j = 1){
+set.seed(2017)
+#print0(" K value is ", j)
+model.knn <- knn(train.set.normalize[,-31],
+                 test.set.normalize[,-31],
+                 cl = train.set.normalize[,31],
+                 k = j)
+
+actual.predict <- data.frame(predicted = model.knn)
+actual.predict$actual <- test.set.normalize[,31]
+count <- 0;
+for (i in (1:nrow(actual.predict))){
+  count  = sum(ifelse(actual.predict$actual == actual.predict$predicted,1,0 ))
+}
+# actual.predict
+# count
+eff <- (100 * count)/nrow(actual.predict)
+
+paste0("Efficiency of KNN model for K " , j ," is " , round(eff,2))
+#return(eff)
+}
+```
+```{r}
+for (k in (1:round(sqrt(nrow(train.set.normalize))))){
+  #k_test(k)
+  print(k_test(k))
+}
+```
+
+```{r}
+k_test(12)
+CrossTable(actual.predict$actual,actual.predict$predicted)
+```
+
+

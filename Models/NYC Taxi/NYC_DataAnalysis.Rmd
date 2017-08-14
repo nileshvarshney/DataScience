@@ -1,0 +1,42 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+## Import Training Data
+```{r}
+train.set <- read.csv("train.csv")
+```
+
+```{r}
+safecopy.train.set <- train.set
+```
+
+# Data Analysis 
+```{r}
+unique(train.set$vendor_id)
+```
+There are 2 Vendor to providde taxi service
+
+```{r}
+train.set$pickup_date <- substr(train.set$pickup_datetime,1,10)
+train.set$pickup_period <- as.numeric(substr(train.set$pickup_datetime,11,13))  * 2  +
+  ifelse(as.numeric(substr(train.set$pickup_datetime,15,16)) > 30, 1,0)
+
+train.set$dropoff_date <- substr(train.set$dropoff_datetime,1,10)
+train.set$dropoff_period <- as.numeric(substr(train.set$dropoff_datetime,11,13))  * 2  +
+  ifelse(as.numeric(substr(train.set$pickup_datetime,15,16)) > 30, 1,0)
+
+```
+*convert pickup and dropoff to date datatype
+```{r}
+train.set$pickup_date <- as.Date(train.set$pickup_date)
+```
+
+```{r}
+as.Date(train.set$dropoff_date,format = "%Y-%m-%d") -> train.set$dropoff_date
+```
+# Add weekend Flag
+```{r}
+train.set$pickup_day <- format(train.set$pickup_date,format = "%A")
+```
+
