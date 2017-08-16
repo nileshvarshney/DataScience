@@ -1,0 +1,64 @@
+---
+title: "Credit Data C5.0 Decision Tree"
+output: html_notebook
+---
+**Include required Libraries**
+```{r}
+library(C50)
+library(gmodels)
+```
+
+####Training C5.0 Model on training data
+```{r}
+model <- C5.0(train.set[-17],train.set$default)
+summary(model)
+```
+#### Evaluate the performance of the model
+```{r}
+test.predict <- predict(model,test.set)
+CrossTable(test.predict,test.set$default,
+           dnn =c("Predicted Result","Actual Result"))
+
+```
+
+27% error, predicted crrect default 14 out of 33 which is just 42% correct prediction for defaults. 
+
+#### Improve Model Performance
+```{r}
+model_boost_10 <- model <- C5.0(train.set[-17],train.set$default,trials = 10)
+#summary(model)
+test.predict_10 <- predict(model_boost_10,test.set)
+CrossTable(test.set$default,test.predict_10,
+           dnn =c("Actual Result","Predicted Result"),
+           prop.r = FALSE,
+           prop.c = FALSE,
+           chisq = FALSE )
+```
+
+20/33 improvement from 14/33.
+
+*Making mistake more costlier*
+
+```{r}
+matrix_diam <- list(c("no","yes"),c("no","yes"))
+names(matrix_diam) = c("predicted","actual")
+matrix_diam
+error_cost = matrix(c(0,1,3,0),nrow = 2,dimnames  = matrix_diam)
+error_cost
+```
+#### Add Error Cost
+*This will make model to more conservative and predict more default to avoid load defaults.*
+```{r}
+model_boost_10 <- model <- C5.0(train.set[-17],
+                                train.set$default,
+                                trials = 10,
+                                costs = error_cost)
+#summary(model)
+test.predict_10 <- predict(model_boost_10,test.set)
+CrossTable(test.set$default,test.predict_10,
+           dnn =c("Actual Result","Predicted Result"),
+           prop.r = FALSE,
+           prop.c = FALSE,
+           chisq = FALSE )
+```
+

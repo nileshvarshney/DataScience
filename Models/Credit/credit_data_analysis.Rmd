@@ -1,0 +1,91 @@
+---
+title: "Credit Data Analysis"
+output: html_notebook
+---
+#### Clear variables, memory and set working directory
+```{r,include=FALSE,echo=FALSE}
+rm(list = ls())
+gc()
+setwd("~/Google Drive/Gits/DataScience/Models/Credit")
+```
+#### Library
+```{r,include=FALSE,echo=FALSE}
+library(ggplot2)
+```
+#### Import Data
+```{r}
+credit <- read.csv("credit.csv")
+str(credit)
+```
+**Checking Account Balance Values**
+```{r}
+table(credit$checking_balance)
+```
+**Credit History**
+```{r}
+table(credit$credit_history)
+```
+**Other Credit**
+```{r}
+table(credit$other_credit)
+```
+**Housing**
+```{r}
+table(credit$housing)
+```
+
+**Job**
+```{r}
+table(credit$job)
+```
+**Phone**
+```{r}
+table(credit$phone)
+```
+
+**defaut**
+```{r}
+table(credit$default)
+```
+```{r}
+summary(credit$months_loan_duration)
+ggplot(data = credit) +
+  geom_histogram(aes(months_loan_duration) , fill = "blue") +
+  scale_x_continuous(name = "Loan Duration (Months)", 
+                     breaks = seq(0,72,3), 
+                     limits = c(0,72)) +
+  scale_y_continuous(name = "No of Loan Accounts") +
+  ggtitle("Loan Month Duration Counts")
+```
+**Loan Amount
+```{r}
+ggplot(data = credit) +
+  geom_histogram(aes(amount) , fill = "orange",binwidth = 100) +
+  scale_x_continuous(name = "Loan Amount",
+                     breaks = seq(0,15000,1000),
+                     limits = c(0,15000)) +
+  scale_y_continuous(name = "No of Loan Accounts") +
+  ggtitle("Loan Amount wise Counts")
+```
+**Age Wise Loan after exclusing top 1% from age and amounts**
+```{r}
+ggplot(data = credit,aes(age,amount)) +
+  geom_point(alpha = 1/5) +
+  xlim(18,quantile(credit$age,0.99)) +
+  ylim(0,quantile(credit$amount,0.99)) +
+  xlab("Age") +
+  ylab(" Loan Amount") +
+  ggtitle("Age Wise Loan excludes top 1% from age and amounts")
+```
+
+
+#### Create training and test data sets
+```{r}
+set.seed(123)
+train.sample = sample(1000,900)
+train.set <- credit[train.sample,]
+test.set <- credit[-train.sample,]
+prop.table(table(train.set$default))  ## training set propotion
+prop.table(table(test.set$default))  ## test set propotion
+```
+
