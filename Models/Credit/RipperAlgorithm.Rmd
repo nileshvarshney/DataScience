@@ -1,0 +1,9 @@
+---
+title: "RIPPER Algorithm (Seperate-and-Conquer) "
+output: html_notebook
+---
+#### Training a model on the data
+```{r}
+library(RWeka)
+```
+

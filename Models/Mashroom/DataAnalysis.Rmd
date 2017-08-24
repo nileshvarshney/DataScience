@@ -1,0 +1,44 @@
+---
+title: "Mushroom Data Analysis"
+output: html_notebook
+---
+**Purpose of this classification to identify the poisonous Mushrooms**
+
+```{r,echo=FALSE}
+library(C50)
+```
+
+### Read Mussrooms data
+```{r}
+mussrooms <- read.csv("mushrooms.csv",header=TRUE,sep=",")
+summary(mussrooms)
+```
+```{r}
+# veil_type has only one value hence removing it 
+mussrooms <- subset(mussrooms,select = -(veil_type))
+set.seed(2000)
+sample.size <- sample(nrow(mussrooms),round(nrow(mussrooms) * 0.8))
+train.set <- mussrooms[sample.size,]
+test.set <- mussrooms[-sample.size,]
+prop.table(table(train.set$type))
+prop.table(table(test.set$type))
+```
+
+#### fit the data in model
+```{r}
+model.c50 <- C5.0(type ~ ., data = train.set,trials = 10)
+summary(model.c50)
+```
+
+```{r}
+library(gmodels)
+CrossTable(test.set$type,predict.C5.0(model.c50,newdata = test.set),
+           chisq = FALSE,prop.r = FALSE,prop.t = FALSE,
+           dnn = c("Actual","Predicted"))
+
+```
+
+```{r}
+plot(model.c50,trial = 1)
+```
+

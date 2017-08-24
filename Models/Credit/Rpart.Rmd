@@ -1,0 +1,34 @@
+---
+title: "CART Modeling"
+output: html_notebook
+---
+```{r}
+library(rpart)
+library(rpart.plot)
+```
+
+#### training a model on data
+```{r}
+model_rpart <- rpart(default ~ .,data = train.set,
+                     method = "class")
+
+# plot(model_rpart)
+printcp(model_rpart)
+plotcp(model_rpart)
+# summary(model_rpart)
+# Get Best CP value from summary to prune the model tree
+bestcp <- model_rpart$cptable[which.min(model_rpart$cptable[,"xerror"])]
+
+# Prune the tree to best CP value
+model_prunned <- prune(model_rpart,cp = bestcp)
+```
+#### Confuse Matrix
+```{r}
+CrossTable(test.set$default,predict(model_prunned,newdata = test.set,type = "class"),
+           dnn = c("Actual","predicted"))
+```
+** confuse matrix shows that there are 13 case of default predicted correctly and 20 case was not considered for default but in actual they they was default.  Performance of this model is not good compare the C50 model. Hence not taking it forward.
+```{r}
+plot(model_prunned)
+```
+

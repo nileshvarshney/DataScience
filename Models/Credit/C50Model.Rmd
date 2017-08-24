@@ -25,7 +25,7 @@ CrossTable(test.predict,test.set$default,
 
 #### Improve Model Performance
 ```{r}
-model_boost_10 <- model <- C5.0(train.set[-17],train.set$default,trials = 10)
+model_boost_10 <- model <- C5.0(train.set[-17],train.set$default,trials = 10,rules = FALSE)
 #summary(model)
 test.predict_10 <- predict(model_boost_10,test.set)
 CrossTable(test.set$default,test.predict_10,
